@@ -10,6 +10,7 @@ parser.add_argument('-d', '--dataverse', default='https://dataverse-awstest.irss
 parser.add_argument('-c', '--collection', help='Sum the size of datasets in the given Dataverse collection.')
 parser.add_argument('-a', '--all_collections', help='Report the sizes of all collections in the given Dataverse.', action='store_true')
 parser.add_argument('-t', '--api_token', help='API token of an admin user.')
+parser.add_argument('-r', '--root_collection', default='root', help='Specify the name of the root collection.')
 
 args = parser.parse_args()
 if (args.collection is None) and (args.all_collections is False):
@@ -25,6 +26,7 @@ dataverse = args.dataverse
 collection = args.collection
 all = args.all_collections
 token = args.api_token
+root_coll = args.root_collection
 
 def get_size(dataverse,collection,token):
     # throws I/O errors in TRSA case
@@ -86,7 +88,7 @@ else:
    #print(collection + ': ' + str(size) + ' bytes, ' + str(dvfilecount) + ' files.')
    
    # iterate through sub-collections
-   instanceurl = dataverse + '/api/dataverses/unc/contents'
+   instanceurl = dataverse + f"/api/dataverses/{root_coll}/contents"
    r = requests.get(instanceurl)
    j = r.json()
    for i in range(len(j["data"])):
@@ -103,4 +105,3 @@ else:
           readablesize = format_size(size)
           dvfilecount = get_filecount(dataverse,collection,token)
           print(collection + ': ' + str(size) + ' bytes' + ' (' + readablesize + '), ' + str(dvfilecount) + ' files.')
-          
